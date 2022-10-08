@@ -49,8 +49,8 @@ public class UserService {
                     idsUrl.add(Long.parseLong(id));
                 }
                 for (Long idk : idsUrl) {
-                    userList.add(userRepository.findById(idk).
-                            orElseThrow(() -> new UserNotFoundException(String.format("Event with id=%d was not found.", idk))));
+                    userList.add(userRepository.findById(idk)
+                            .orElseThrow(() -> new UserNotFoundException(String.format("Event with id=%d was not found.", idk))));
                 }
                 return userList.stream()
                         .map(user -> UserMapper.toUserDto(user))
