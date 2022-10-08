@@ -3,6 +3,7 @@ services:
   stats-server:
     build: ./statistics
     container_name: statistics
+    restart: always
     ports:
       - "9090:9090"
     depends_on:
@@ -27,6 +28,7 @@ services:
   ewm-service:
     build: ./ewm
     container_name: ewm
+    restart: always
     ports:
       - "8080:8080"
     depends_on:
