@@ -43,7 +43,7 @@ public class RequestService {
             Event event = eventStorage.findById(eventId)
                     .orElseThrow(() -> new UserNotFoundException(String.format("Event with id=%d was not found.", eventId)));
             Optional<Request> requestSearch = requestRepository.findByRequesterIdAndEventId(requesterId, eventId);
-            if (requestSearch.isPresent() || event.getInitiator().getId() == requesterId || !event.getState().equals("PUBLISHED")) {
+            if (requestSearch.isPresent() || event.getInitiator().getId().equals(requesterId) || !event.getState().equals("PUBLISHED")) {
                 throw new ForbiddenError(String.format("FORBIDDEN"));
             }
             if (event.getParticipantLimit() != 0) {

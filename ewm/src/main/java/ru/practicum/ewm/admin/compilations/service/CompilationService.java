@@ -63,7 +63,7 @@ public class CompilationService {
             Compilation compilation = compilationStorage.findById(id)
                     .orElseThrow(() -> new UserNotFoundException(String.format("Event with id=%d was not found.", id)));
                 List<Event> eventList = compilation.getEvents();
-                eventList.removeIf(e -> e.getId() == eId);
+                eventList.removeIf(e -> e.getId().equals(eId));
                 compilation.setEvents(eventList);
                 compilationStorage.save(compilation);
         } catch (NumberFormatException numberFormatException) {
