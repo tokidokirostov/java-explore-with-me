@@ -10,7 +10,7 @@ import java.util.List;
 
 public interface StatisticStorage extends JpaRepository<EndpointHit, Long> {
 
-    @Query("select new ru.practicum.statisrics.dto.ViewStats(s.app, s.uri, count(s)) from EndpointHit as s " +
+    @Query("select new ru.practicum.statisrics.dto.ViewStats(s.app, s.uri, count(s.id)) from EndpointHit as s " +
             "where (s.timestamp between ?1 and ?2) and s.uri=(?3) " +
             "group by s.uri, s.app")
     List<ViewStats> findAllEndpointsUri(
@@ -19,9 +19,9 @@ public interface StatisticStorage extends JpaRepository<EndpointHit, Long> {
             List<String> uri
     );
 
-    @Query("select new ru.practicum.statisrics.dto.ViewStats(s.app, s.uri, count(s)) from EndpointHit as s " +
+    @Query("select new ru.practicum.statisrics.dto.ViewStats(s.app, s.uri, count(s.id)) from EndpointHit as s " +
             "where (s.timestamp between ?1 and ?2) " +
-            "group by s.app")
+            "group by s.app, s.uri")
     List<ViewStats> findAllEndpoints(
             LocalDateTime start,
             LocalDateTime end
@@ -38,7 +38,7 @@ public interface StatisticStorage extends JpaRepository<EndpointHit, Long> {
 
     @Query("select new ru.practicum.statisrics.dto.ViewStats(s.app, s.uri, count(distinct s.ip)) from EndpointHit as s " +
             "where (s.timestamp between ?1 and ?2) " +
-            "group by s.app")
+            "group by s.app, s.uri")
     List<ViewStats> findAllEndpointsUnique(
             LocalDateTime start,
             LocalDateTime end

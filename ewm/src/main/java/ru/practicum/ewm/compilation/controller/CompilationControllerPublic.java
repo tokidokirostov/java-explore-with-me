@@ -4,8 +4,8 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.ewm.admin.compilations.dto.CompilationDto;
-import ru.practicum.ewm.compilation.servise.CompilationServicePublic;
+import ru.practicum.ewm.compilation.dto.CompilationDto;
+import ru.practicum.ewm.compilation.servise.CompilationService;
 
 import java.util.List;
 
@@ -14,8 +14,9 @@ import java.util.List;
 @RequestMapping(path = "/compilations")
 @AllArgsConstructor
 public class CompilationControllerPublic {
+
     @Autowired
-    private final CompilationServicePublic compilationServicePublic;
+    private final CompilationService compilationService;
 
     //Получение подборок событий
     @GetMapping
@@ -23,13 +24,13 @@ public class CompilationControllerPublic {
                                                    @RequestParam(defaultValue = "0") String from,
                                                    @RequestParam(defaultValue = "10") String size) {
         log.info("Получен запрос GET /compilations");
-        return compilationServicePublic.getAllCompilations(pinned, from, size);
+        return compilationService.getAllCompilations(pinned, from, size);
     }
 
     //Получение подборки событий по его id
     @GetMapping("{id}")
     public CompilationDto getCompilation(@PathVariable(name = "id") String id) {
         log.info("Получен запрос GET /compilations/{}", id);
-        return compilationServicePublic.getCompilation(id);
+        return compilationService.getCompilation(id);
     }
 }

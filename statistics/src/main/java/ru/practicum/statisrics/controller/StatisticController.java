@@ -28,8 +28,8 @@ public class StatisticController {
     @GetMapping("/stats")
     public List<ViewStats> getStats(@RequestParam(name = "start") String start,
                                     @RequestParam(name = "end") String end,
-                                    @RequestParam(name = "uris") List<String> uris,
-                                    @RequestParam(name = "unique") Boolean unique
+                                    @RequestParam(name = "uris", required = false) List<String> uris,
+                                    @RequestParam(name = "unique", required = false) Boolean unique
     ) {
         log.info("---> Получен запрос Get /stats ");
         return statisticService.getStats(start, end, uris, unique);

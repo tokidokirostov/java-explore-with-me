@@ -28,11 +28,11 @@ public class StatisticService {
         LocalDateTime start = LocalDateTime.parse(startS, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
         LocalDateTime end = LocalDateTime.parse(endS, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
         List<ViewStats> viewStats;
-        if (uris.isEmpty() && unique) {
+        if (uris == null && unique) {
             viewStats = statisticStorage.findAllEndpointsUnique(start, end);
-        } else if (uris.isEmpty() && !unique) {
+        } else if (uris == null && !unique) {
             viewStats = statisticStorage.findAllEndpoints(start, end);
-        } else if (!uris.isEmpty() && unique) {
+        } else if (uris != null && unique) {
             viewStats = statisticStorage.findAllEndpointsUriUnique(start, end, uris);
         } else {
             viewStats = statisticStorage.findAllEndpointsUri(start, end, uris);

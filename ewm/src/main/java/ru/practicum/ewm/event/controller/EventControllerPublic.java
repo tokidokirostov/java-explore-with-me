@@ -4,8 +4,8 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.ewm.event.service.EventServicePublic;
-import ru.practicum.ewm.user.event.dto.EventDto;
+import ru.practicum.ewm.event.dto.EventDto;
+import ru.practicum.ewm.event.service.EventService;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
@@ -16,15 +16,15 @@ import java.util.List;
 @AllArgsConstructor
 public class EventControllerPublic {
     @Autowired
-    private final EventServicePublic eventServicePublic;
+    EventService eventService;
 
     //Получение подробной информации об опубликованном событии по его идентификатору
     @GetMapping("{id}")
     public EventDto getEvent(@PathVariable(name = "id") String id,
                              HttpServletRequest httpServletRequest) {
-        eventServicePublic.createStat(httpServletRequest);
+        eventService.createStat(httpServletRequest);
         log.info("Получен запрос GET /events/{}", id);
-        return eventServicePublic.getEvent(id);
+        return eventService.getEvent(id);
     }
 
     //Получение событий с возможностью фильтраций
@@ -40,9 +40,10 @@ public class EventControllerPublic {
                                     @RequestParam(defaultValue = "0") String from,
                                     @RequestParam(defaultValue = "10") String size,
                                     HttpServletRequest httpServletRequest) {
+        eventService.createStat(httpServletRequest);
         log.info("Получен запрос GET /events/");
-        eventServicePublic.createStat(httpServletRequest);
-        return eventServicePublic.getEventsPublic(text, categories, paid, rangeStart, rangeEnd, onlyAvailable, sort, from, size);
+
+        return eventService.getEventsPublic(text, categories, paid, rangeStart, rangeEnd, onlyAvailable, sort, from, size);
     }
 
 }
