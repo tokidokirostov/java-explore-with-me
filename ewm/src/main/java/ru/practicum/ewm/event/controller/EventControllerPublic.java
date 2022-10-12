@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.ewm.event.dto.EventDto;
+import ru.practicum.ewm.event.model.EventSort;
 import ru.practicum.ewm.event.service.EventService;
 
 import javax.servlet.http.HttpServletRequest;
@@ -36,7 +37,7 @@ public class EventControllerPublic {
                                     @RequestParam(required = false) String rangeStart,
                                     @RequestParam(required = false) String rangeEnd,
                                     @RequestParam(required = false) String onlyAvailable,
-                                    @RequestParam(required = false) String sort,
+                                    @RequestParam(required = false) EventSort sort,
                                     @RequestParam(defaultValue = "0") String from,
                                     @RequestParam(defaultValue = "10") String size,
                                     HttpServletRequest httpServletRequest) {

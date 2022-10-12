@@ -16,6 +16,7 @@ import ru.practicum.ewm.client.StatClient;
 import ru.practicum.ewm.client.ViewStats;
 import ru.practicum.ewm.event.dto.*;
 import ru.practicum.ewm.event.model.Event;
+import ru.practicum.ewm.event.model.EventSort;
 import ru.practicum.ewm.event.model.EventState;
 import ru.practicum.ewm.event.storage.EventStorage;
 import ru.practicum.ewm.exception.ForbiddenError;
@@ -256,7 +257,7 @@ public class EventService {
 
     //Получение событий с возможностью фильтраций
     public List<EventDto> getEventsPublic(String text, List<String> categoriesSt, String paidS, String rangeStartSt, String rangeEndSt,
-                                          String onlyAvailableS, String sortS, String fromS, String sizeS) {
+                                          String onlyAvailableS, EventSort eventSort, String fromS, String sizeS) {
         try {
             Integer from = Integer.parseInt(fromS);
             Integer size = Integer.parseInt(sizeS);
@@ -285,14 +286,14 @@ public class EventService {
                 rangeEnd = LocalDateTime.parse(rangeEndSt, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
             }
             Page<Event> eventList = eventStorage.searchEvents(text, categories, paid, onlyAvailable, rangeStart, rangeEnd, page);
-            if (sortS != null && sortS.equals("EVENT_DATE")) {
+            if (eventSort != null && eventSort.equals(EventSort.EVENT_DATE)) {
                 return eventList
                         .stream()
                         .peek(event -> event.setViews(getStat(event.getCreatedOn(), LocalDateTime.now(), String.valueOf(event.getId()), true)))
                         .sorted(Comparator.comparing(Event::getEventDate))
                         .map(event -> EventMapper.toEventDto(event))
                         .collect(Collectors.toList());
-            } else if (sortS != null && sortS.equals("VIEWS")) {
+            } else if (eventSort != null && eventSort.equals(EventSort.VIEWS)) {
                 return eventList
                         .stream()
                         .map(this::addViews)

@@ -7,18 +7,21 @@ import lombok.NoArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import ru.practicum.ewm.event.model.EventLocation;
 
-import javax.validation.constraints.NotNull;
+import javax.validation.constraints.*;
 import java.time.LocalDateTime;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class NewEventDto {
-    @NotNull
+    @NotEmpty
+    @NotBlank
     String annotation;
-    @NotNull
+    @NotEmpty
+    @NotBlank
     Long category;
-    @NotNull
+    @NotEmpty
+    @NotBlank
     String description;
     @NotNull
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE, pattern = "yyyy-MM-dd HH:mm:ss")
@@ -28,11 +31,15 @@ public class NewEventDto {
     EventLocation location;
     @NotNull
     boolean paid;
-    @NotNull
+    @NotEmpty
+    @NotBlank
+    @Size(min = 0)
+    @PositiveOrZero
     int participantLimit;
     @NotNull
     boolean requestModeration;
-    @NotNull
+    @NotEmpty
+    @NotBlank
     String title;
 
 }
