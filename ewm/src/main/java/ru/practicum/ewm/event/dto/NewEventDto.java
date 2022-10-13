@@ -16,12 +16,13 @@ import java.time.LocalDateTime;
 public class NewEventDto {
     @NotEmpty
     @NotBlank
+    @Size(max = 400)
     String annotation;
-    @NotEmpty
-    @NotBlank
+    @NotNull
     Long category;
     @NotEmpty
     @NotBlank
+    @Size(max = 4000)
     String description;
     @NotNull
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE, pattern = "yyyy-MM-dd HH:mm:ss")
@@ -29,17 +30,16 @@ public class NewEventDto {
     LocalDateTime eventDate;
     @NotNull
     EventLocation location;
-    @NotNull
+    @NotEmpty
     boolean paid;
     @NotEmpty
-    @NotBlank
-    @Size(min = 0)
     @PositiveOrZero
     int participantLimit;
-    @NotNull
+    @NotEmpty
     boolean requestModeration;
     @NotEmpty
     @NotBlank
+    @Size(max = 255)
     String title;
 
 }

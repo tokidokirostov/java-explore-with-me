@@ -32,7 +32,7 @@ CREATE TABLE IF NOT EXISTS events (
         category_id BIGINT NOT NULL ,
         confirmed_requests INT NOT NULL ,
         creation_on TIMESTAMP NOT NULL ,
-        description TEXT NOT NULL ,
+        description VARCHAR(4000) NOT NULL ,
         event_date TIMESTAMP NOT NULL ,
         initiator_id BIGINT NOT NULL ,
         paid BOOLEAN NOT NULL ,

@@ -9,6 +9,7 @@ import ru.practicum.ewm.category.model.Category;
 import ru.practicum.ewm.user.model.User;
 
 import javax.persistence.*;
+import javax.validation.constraints.Size;
 import java.time.LocalDateTime;
 
 @Entity
@@ -21,6 +22,7 @@ public class Event {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
     @Column(name = "annotation")
+    @Size(max = 400)
     String annotation;
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "category_id")
