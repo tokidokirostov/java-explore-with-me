@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.ewm.event.dto.EventDto;
+import ru.practicum.ewm.event.model.Event;
 import ru.practicum.ewm.event.model.EventSort;
 import ru.practicum.ewm.event.service.EventService;
 
@@ -22,7 +23,7 @@ public class EventControllerPublic {
     //Получение подробной информации об опубликованном событии по его идентификатору
     @GetMapping("{id}")
     public EventDto getEvent(@PathVariable(name = "id") String id,
-                             HttpServletRequest httpServletRequest) {
+                          HttpServletRequest httpServletRequest) {
         eventService.createStat(httpServletRequest);
         log.info("Получен запрос GET /events/{}", id);
         return eventService.getEvent(id);

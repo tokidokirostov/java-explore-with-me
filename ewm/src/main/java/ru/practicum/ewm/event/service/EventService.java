@@ -14,6 +14,9 @@ import ru.practicum.ewm.category.storage.CategoriesRepository;
 import ru.practicum.ewm.client.EndpointHit;
 import ru.practicum.ewm.client.StatClient;
 import ru.practicum.ewm.client.ViewStats;
+import ru.practicum.ewm.comment.dto.CommentDto;
+import ru.practicum.ewm.comment.dto.CommentMapper;
+import ru.practicum.ewm.comment.storage.CommentRepository;
 import ru.practicum.ewm.event.dto.*;
 import ru.practicum.ewm.event.model.Event;
 import ru.practicum.ewm.event.model.EventSort;
@@ -50,6 +53,8 @@ public class EventService {
 
     @Autowired
     private final StatClient statClient;
+
+    @Autowired private final CommentRepository commentRepository;
     protected final ObjectMapper mapper;
 
     //Добавление нового события
@@ -67,8 +72,8 @@ public class EventService {
                             .orElseThrow(() -> new UserNotFoundException(String.format("Event with id=%d was not found.",
                                     newEventDto.getCategory())));
                 }
-                Event event = eventStorage.save(EventMapper.toEvent(newEventDto, user, category));
-                return EventMapper.toEventDto(event);
+                Event event = eventStorage.save(EventMapper.toEvent(newEventDto, user, category, null));
+                return EventMapper.toEventDto(event, getComments(event.getId()));
             } else throw new ForbiddenError(String.format("FORBIDDEN"));
 
         } catch (NumberFormatException numberFormatException) {
@@ -119,7 +124,7 @@ public class EventService {
                 event.get().setPaid(eventUpdateDto.isPaid());
                 event.get().setParticipantLimit(eventUpdateDto.getParticipantLimit());
                 event.get().setTitle(eventUpdateDto.getTitle());
-                return EventMapper.toEventDto(eventStorage.save(event.get()));
+                return EventMapper.toEventDto(eventStorage.save(event.get()), getComments(event.get().getId()));
             } else throw new ForbiddenError(String.format("FORBIDDEN"));
         } catch (NumberFormatException numberFormatException) {
             throw new RequestError(String.format("FORBIDDEN"));
@@ -133,8 +138,9 @@ public class EventService {
             Long userId = Long.parseLong(userIdS);
             Long eventId = Long.parseLong(eventIdS);
             checkUser(userId);
-            return EventMapper.toEventDto(eventStorage.findByIdAndInitiatorId(eventId, userId)
-                    .orElseThrow(() -> new UserNotFoundException(String.format("Event with id=%d was not found.", eventId))));
+            Event event = eventStorage.findByIdAndInitiatorId(eventId, userId)
+                    .orElseThrow(() -> new UserNotFoundException(String.format("Event with id=%d was not found.", eventId)));
+            return EventMapper.toEventDto(event, getComments(event.getId()));
         } catch (NumberFormatException numberFormatException) {
             throw new RequestError(String.format("FORBIDDEN"));
         }
@@ -150,7 +156,8 @@ public class EventService {
                     .orElseThrow(() -> new UserNotFoundException(String.format("Event with id=%d was not found.", userId)));
             if (event.getState().equals("PENDING")) {
                 event.setState(String.valueOf(EventState.CANCELED));
-                return EventMapper.toEventDto(eventStorage.save(event));
+                event = eventStorage.save(event);
+                return EventMapper.toEventDto(event, getComments(event.getId()));
             } else throw new ForbiddenError(String.format("FORBIDDEN"));
         } catch (NumberFormatException numberFormatException) {
             throw new RequestError(String.format("FORBIDDEN"));
@@ -247,7 +254,7 @@ public class EventService {
                     .orElseThrow(() -> new UserNotFoundException(String.format("Event with id=%d was not found.", id)));
             if (event.getState().equals("PUBLISHED")) {
                 event.setViews(getStat(event.getCreatedOn(), LocalDateTime.now(), idS, true));
-                return EventMapper.toEventDto(event);
+                return EventMapper.toEventDto(event, getComments(event.getId()));
             } else throw new ForbiddenError(String.format("FORBIDDEN"));
         } catch (
                 NumberFormatException numberFormatException) {
@@ -291,17 +298,17 @@ public class EventService {
                         .stream()
                         .peek(event -> event.setViews(getStat(event.getCreatedOn(), LocalDateTime.now(), String.valueOf(event.getId()), true)))
                         .sorted(Comparator.comparing(Event::getEventDate))
-                        .map(event -> EventMapper.toEventDto(event))
+                        .map(event -> EventMapper.toEventDto(event, getComments(event.getId())))
                         .collect(Collectors.toList());
             } else if (eventSort != null && eventSort.equals(EventSort.VIEWS)) {
                 return eventList
                         .stream()
                         .map(this::addViews)
                         .sorted(Comparator.comparing(Event::getViews))
-                        .map(event -> EventMapper.toEventDto(event))
+                        .map(event -> EventMapper.toEventDto(event, getComments(event.getId())))
                         .collect(Collectors.toList());
             } else return eventList.stream()
-                    .map(event -> EventMapper.toEventDto(event))
+                    .map(event -> EventMapper.toEventDto(event, getComments(event.getId())))
                     .collect(Collectors.toList());
         } catch (NumberFormatException numberFormatException) {
             throw new RequestError(String.format("FORBIDDEN"));
@@ -319,7 +326,8 @@ public class EventService {
             if (eventDate.plusHours(1).isAfter(localDateTime) && event.getState().equals("PENDING")) {
                 event.setPublisheOn(localDateTime);
                 event.setState(String.valueOf(EventState.PUBLISHED));
-                return EventMapper.toEventDto(eventStorage.save(event));
+                event = eventStorage.save(event);
+                return EventMapper.toEventDto(event, getComments(event.getId()));
             } else throw new ForbiddenError(String.format("FORBIDDEN"));
         } catch (
                 NumberFormatException numberFormatException) {
@@ -336,7 +344,8 @@ public class EventService {
                     .orElseThrow(() -> new UserNotFoundException(String.format("Event with id=%d was not found.", id)));
             if (!event.getState().equals("PUBLISHED")) {
                 event.setState(String.valueOf(EventState.CANCELED));
-                return EventMapper.toEventDto(eventStorage.save(event));
+                event = eventStorage.save(event);
+                return EventMapper.toEventDto(event, getComments(event.getId()));
             } else throw new ForbiddenError(String.format("FORBIDDEN"));
         } catch (NumberFormatException numberFormatException) {
             throw new RequestError(String.format("FORBIDDEN"));
@@ -363,7 +372,8 @@ public class EventService {
             event.setParticipantLimit(eventDto.getParticipantLimit());
             event.setRequestModeration(eventDto.isRequestModeration());
             event.setTitle(eventDto.getTitle());
-            return EventMapper.toEventDto(eventStorage.save(event));
+            event = eventStorage.save(event);
+            return EventMapper.toEventDto(event, getComments(event.getId()));
         } catch (
                 NumberFormatException numberFormatException) {
             throw new RequestError(String.format("FORBIDDEN"));
@@ -397,7 +407,7 @@ public class EventService {
             }
             return eventStorage.searchEventByAdmin(users, states, categories, rangeStart, rangeEnd, page)
                     .stream()
-                    .map(event -> EventMapper.toEventDto(event))
+                    .map(event -> EventMapper.toEventDto(event, getComments(event.getId())))
                     .collect(Collectors.toList());
         } catch (NumberFormatException numberFormatException) {
             throw new RequestError(String.format("FORBIDDEN"));
@@ -443,5 +453,10 @@ public class EventService {
                 .orElseThrow(() -> new UserNotFoundException(String.format("Event with id=%d was not found.", id)));
     }
 
+private List<CommentDto> getComments(Long eventId) {
+        return commentRepository.findAllByEventId(eventId).stream()
+                .map(comment -> CommentMapper.toCommentDto(comment))
+                .collect(Collectors.toList());
+}
 
 }
