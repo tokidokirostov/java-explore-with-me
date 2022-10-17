@@ -24,7 +24,7 @@ public class CommentControllerAdmin {
         return commentService.getCommentAdmin(userId, eventId, commentId);
     }
 
-    //Просмотр коментария администратором
+    //Удаление коментария администратором
     @DeleteMapping("/{userId}/events/{eventId}/comments/{commentId}")
     public void deleteCommentAdmin(@PathVariable Long userId,
                               @PathVariable Long eventId,

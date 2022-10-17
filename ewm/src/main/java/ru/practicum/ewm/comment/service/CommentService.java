@@ -45,8 +45,7 @@ public class CommentService {
         isUser(userId);
         Event event = isEvent(eventId);
         event.setViews(eventService.getEvent(String.valueOf(eventId)).getViews());
-        Comment comment = commentRepository.findById(commentId)
-                .orElseThrow(() -> new UserNotFoundException(String.format("Event with id=%d was not found.", commentId)));
+        Comment comment = getCommentInBase(commentId);
         comment.setEvent(event);
         return CommentMapper.toCommentDto(comment);
     }
@@ -56,8 +55,7 @@ public class CommentService {
     public void deleteComment(Long userId, Long eventId, Long commentId) {
         User user = isUser(userId);
         isEvent(eventId);
-        Comment comment = commentRepository.findById(commentId)
-                .orElseThrow(() -> new UserNotFoundException(String.format("Event with id=%d was not found.", commentId)));
+        Comment comment = getCommentInBase(commentId);
         if (comment.getUser().equals(user)) {
             commentRepository.deleteById(commentId);
         } else throw new ForbiddenError(String.format("FORBIDDEN"));
@@ -68,8 +66,7 @@ public class CommentService {
     public CommentDto putComment(Long userId, Long eventId, Long commentId, NewCommentDto newCommentDto) {
         User user = isUser(userId);
         isEvent(eventId);
-        Comment comment = commentRepository.findById(commentId)
-                .orElseThrow(() -> new UserNotFoundException(String.format("Event with id=%d was not found.", commentId)));
+        Comment comment = getCommentInBase(commentId);
         if (comment.getUser().equals(user)) {
             comment.setComment(newCommentDto.getComment());
             return CommentMapper.toCommentDto(commentRepository.save(comment));
@@ -90,6 +87,11 @@ public class CommentService {
         isUser(userId);
         isEvent(eventId);
         commentRepository.deleteById(commentId);
+    }
+
+    private Comment getCommentInBase(Long commentId) {
+        return commentRepository.findById(commentId)
+                .orElseThrow(() -> new UserNotFoundException(String.format("Event with id=%d was not found.", commentId)));
     }
 
     private User isUser(Long userId) {

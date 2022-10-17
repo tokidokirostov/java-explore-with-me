@@ -14,6 +14,6 @@ import javax.validation.constraints.Size;
 public class NewCommentDto {
     @NotEmpty
     @NotBlank
-    @Size(max = 400)
+    @Size(max = 4000)
     String comment;
 }
